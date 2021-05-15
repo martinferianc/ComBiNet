@@ -75,11 +75,10 @@ class StreamSegMetrics():
     
     def _fast_hist(self, label_true, label_pred):
         mask = (label_true >= 0) & (label_true < self.n_classes)
-        hist = torch.bincount(
+        return torch.bincount(
             self.n_classes * label_true[mask].long() + label_pred[mask],
             minlength=self.n_classes ** 2,
         ).reshape(self.n_classes, self.n_classes)
-        return hist
 
     def get_results(self):
         with torch.no_grad():

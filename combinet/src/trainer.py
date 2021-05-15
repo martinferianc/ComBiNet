@@ -34,8 +34,7 @@ class Trainer():
     self.writer.add_scalar(info+'nll', nll, iteration)
 
   def _get_average_meters(self):
-    obj = AverageMeter()
-    return obj
+    return AverageMeter()
 
   def train_loop(self, train_loader, valid_loader, writer=None, special_infor=""):
     self.writer = writer

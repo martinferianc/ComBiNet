@@ -94,11 +94,7 @@ def macs_to_string(macs, units='GMac', precision=2):
 def accumulate_macs(self):
     if is_supported_instance(self):
         return self.__macs__
-    else:
-        sum = 0
-        for m in self.children():
-            sum += m.accumulate_macs()
-        return sum
+    return sum(m.accumulate_macs() for m in self.children())
 
 
 def print_model_with_macs(model, total_macs, units='GMac',
@@ -183,7 +179,7 @@ def start_macs_count(self, **kwargs):
 
     def add_macs_counter_hook_function(module, verbose, ignore_list):
         if type(module) in ignore_list:
-            seen_types.add(type(module))
+            pass
         elif is_supported_instance(module):
             if hasattr(module, '__macs_handle__'):
                 return
@@ -193,13 +189,16 @@ def start_macs_count(self, **kwargs):
             else:
                 handle = module.register_forward_hook(MODULES_MAPPING[type(module)])
             module.__macs_handle__ = handle
-            seen_types.add(type(module))
         else:
-            if verbose and not type(module) in (nn.Sequential, nn.ModuleList) and \
-               not type(module) in seen_types:
+            if (
+                verbose
+                and type(module) not in (nn.Sequential, nn.ModuleList)
+                and type(module) not in seen_types
+            ):
                 logging.info('Warning: module ' + type(module).__name__ +
                       ' is treated as a zero-op.')
-            seen_types.add(type(module))
+
+        seen_types.add(type(module))
 
     self.apply(partial(add_macs_counter_hook_function, **kwargs))
 
@@ -317,7 +316,6 @@ def batch_counter_hook(module, input, output):
         input = input[0]
         batch_size = len(input)
     else:
-        pass
         print('Warning! No positional inputs found for a module,'
               ' assuming batch size is 1.')
     module.__batch_counter__ += batch_size
@@ -370,13 +368,13 @@ MODULES_MAPPING = {
 
 
 def is_supported_instance(module):
-    if type(module) in MODULES_MAPPING or type(module) in CUSTOM_MODULES_MAPPING:
-        return True
-    return False
+    return (
+        type(module) in MODULES_MAPPING
+        or type(module) in CUSTOM_MODULES_MAPPING
+    )
 
 
 def remove_macs_counter_hook_function(module):
-    if is_supported_instance(module):
-        if hasattr(module, '__macs_handle__'):
-            module.__macs_handle__.remove()
-            del module.__macs_handle__
+    if is_supported_instance(module) and hasattr(module, '__macs_handle__'):
+        module.__macs_handle__.remove()
+        del module.__macs_handle__

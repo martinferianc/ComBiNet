@@ -43,8 +43,12 @@ class DiceLoss(nn.Module):
             target = target[:,:-1,:,:]
         intersection = torch.sum(predict * target, dim = [0, 2, 3])
         union = torch.sum(predict, dim = [0, 2, 3]) +  torch.sum(target, dim = [0, 2, 3])
-        loss = -torch.log(torch.mean((2.* intersection + self.smooth)/ (union+self.smooth), dim = 0)+1e-8)
-        return loss
+        return -torch.log(
+            torch.mean(
+                (2.0 * intersection + self.smooth) / (union + self.smooth), dim=0
+            )
+            + 1e-8
+        )
 
 class IoULoss(nn.Module):
     def __init__(self, smooth=1.):

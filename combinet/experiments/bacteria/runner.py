@@ -68,9 +68,9 @@ def main():
   model = None
   if args.model == "combinet51":
     model_temp = CombiNet51
-  if args.model == "combinet62":
+  elif args.model == "combinet62":
     model_temp = CombiNet62
-  if args.model == "combinet87":
+  elif args.model == "combinet87":
     model_temp = CombiNet87
 
 
@@ -82,7 +82,7 @@ def main():
     logging.info('# Start Re-training #')
 
     model = model_temp(args=args, n_classes=args.n_classes)
-    
+
     logging.info('### Loading model to parallel GPUs ###')
     model = utils.model_to_gpus(model, args)
     count_parameters_macs(model)
@@ -93,7 +93,7 @@ def main():
           model.parameters(),
           args.learning_rate,
           weight_decay=args.weight_decay)
-    
+
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.996)
 
     logging.info('## Beginning Training ##')

@@ -68,9 +68,9 @@ def main():
   model = None
   if args.model == "combinet51":
     model_temp = CombiNet51
-  if args.model == "combinet62":
+  elif args.model == "combinet62":
     model_temp = CombiNet62
-  if args.model == "combinet87":
+  elif args.model == "combinet87":
     model_temp = CombiNet87
 
   if args.load=='EXP':
@@ -91,7 +91,7 @@ def main():
           model.parameters(),
           args.learning_rate,
           weight_decay=args.weight_decay)
-    
+
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.996)
 
     logging.info('## Beginning Training ##')

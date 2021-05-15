@@ -56,10 +56,20 @@ def get_train_loaders(args):
     else:
         raise NotImplementedError("Other datasets not implemented")
     train_loader = torch.utils.data.DataLoader(
-            train_dset, batch_size=args.train_batch_size, shuffle=True, pin_memory=True if args.gpu!=-1 else False)
+        train_dset,
+        batch_size=args.train_batch_size,
+        shuffle=True,
+        pin_memory=args.gpu != -1,
+    )
+
     valid_loader = torch.utils.data.DataLoader(
-            valid_dset, batch_size=args.valid_batch_size, shuffle=False, pin_memory=True if args.gpu!=-1 else False)
-        
+        valid_dset,
+        batch_size=args.valid_batch_size,
+        shuffle=False,
+        pin_memory=args.gpu != -1,
+    )
+
+
     logging.info('### Train size: {}, Validation size: {} ###'.format(
             len(train_loader.dataset), len(valid_loader.dataset)))
 
@@ -101,7 +111,12 @@ def get_test_loader(args, shuffle=False):
     else:
         raise NotImplementedError("Other datasets not implemented")
     test_loader = torch.utils.data.DataLoader(
-        test_dset, batch_size=args.test_batch_size, shuffle=shuffle, pin_memory=True if args.gpu!=-1 else False)
+        test_dset,
+        batch_size=args.test_batch_size,
+        shuffle=shuffle,
+        pin_memory=args.gpu != -1,
+    )
+
     logging.info('### Test size: {} ###'.format(len(test_loader.dataset)))
     return test_loader
     

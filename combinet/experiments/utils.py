@@ -39,8 +39,8 @@ def segmentation_evaluation(model, mode, args, results_name="/results.pickle", r
       results["miou"]["random"] = miou
       results["mean_dice"]["random"] = mean_dice
     save_name = results_name
-    if results_name == "/results.pickle":
-      save_name = "/results_wa.pickle" if mode=="wa" else "/results_mcd.pickle"
+    if save_name == "/results.pickle":
+        save_name = "/results_wa.pickle" if mode=="wa" else "/results_mcd.pickle"
     utils.save_pickle(results, args.save+save_name, True)
     logging.info("## Results: {} ##".format(results))
 

@@ -46,13 +46,13 @@ def _view_annotated(tensor, colors):
     r = temp.copy()
     g = temp.copy()
     b = temp.copy()
-    for l in range(0, len(colors)):
+    for l in range(len(colors)):
         r[temp == l] = colors[l][0]
         g[temp == l] = colors[l][1]
         b[temp == l]= colors[l][2]
 
     rgb = np.zeros((temp.shape[0], temp.shape[1], 3))
-    rgb[:, :, 0] = (r/255.0)  
+    rgb[:, :, 0] = (r/255.0)
     rgb[:, :, 1] = (g/255.0)
     rgb[:, :, 2] = (b/255.0)
     return rgb

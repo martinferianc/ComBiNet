@@ -104,9 +104,8 @@ class CombiNet(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 torch.nn.init.kaiming_uniform_(m.weight,  nonlinearity='relu')
-            if isinstance(m, nn.BatchNorm2d):
-                if m.bias is not None:
-                    m.bias.data.uniform_(0,1)
+            if isinstance(m, nn.BatchNorm2d) and m.bias is not None:
+                m.bias.data.uniform_(0,1)
  
     def eval(self, mode="wa"):
         super().eval()

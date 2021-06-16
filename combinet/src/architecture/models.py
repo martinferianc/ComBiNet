@@ -2,21 +2,21 @@ import torch.nn as nn
 from combinet.src.architecture.layers import *
 from combinet.src.architecture.aspp import ASPP
 
-def CombiNet51(args, n_classes):
+def CombiNetS(args, n_classes):
     return CombiNet(
         in_channels=3, down_blocks=(4, 4, 4, 4, 4),
         up_blocks=(4, 4, 4, 4, 4), bottleneck_layers=4, aspps = [False, True, True, True, False],
         growth_rate=12, out_chans_first_conv=48, n_classes=n_classes,  args=args)
 
 
-def CombiNet62(args, n_classes):
+def CombiNetM(args, n_classes):
     return CombiNet(
         in_channels=3, down_blocks=(5, 5, 5, 5, 5),
         up_blocks=(5, 5, 5, 5, 5), bottleneck_layers=5, aspps = [False, True, True, True, False],
         growth_rate=16, out_chans_first_conv=48, n_classes=n_classes,  args=args)
 
 
-def CombiNet87(args, n_classes):
+def CombiNetL(args, n_classes):
     return CombiNet(
         in_channels=3, down_blocks=(5, 6, 7, 8, 9),
         up_blocks=(9, 8, 7, 6, 5), bottleneck_layers=10, aspps = [False, True, True, True, False],

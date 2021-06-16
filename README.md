@@ -31,15 +31,15 @@ The calculations are all run with Python 3.8>= through the scripts in the `combi
 
 The data used in this study should be downloaded from https://github.com/alexgkendall/SegNet-Tutorial/tree/master/CamVid and https://www.kaggle.com/longnguyen2306/bacteria-detection-with-darkfield-microscopy and placed under `combinet/data` with the same structure as seen in the link (CamVid). For pre-processing the bacteria dataset we provide a script `combinet/data/preprocess_bacteria.py`, it splits the data into training, test and validation and infers the necessary constants. 
 
-To run the best pretrained models for both datasets (combinet87 for CamVid and combinet62 for Bacteria):
+To run the best pretrained models for both datasets (combinetL for CamVid and combinetM for Bacteria):
 ```bash
 # --gpu flag to select the GPU index for acceleration
 # --visualise flag to enable visualisation during traning and evaluation
 # Inside for example `combinet/experiments/camvid/`
-python3 runner.py --gpu 0 --model combinet87 --load ./combinet87/weights_799.pt --visualise
+python3 runner.py --gpu 0 --model combinetL --load ./combinetL/weights_799.pt --visualise
 
 # Inside for example `combinet/experiments/bacteria/`
-python3 runner.py --gpu 0 --model combinet62 --load ./combinet62/weights_799.pt --visualise
+python3 runner.py --gpu 0 --model combinetM --load ./combinetM/weights_799.pt --visualise
 
 # To check that all looks good with the datasets you can also run
 # You should find the desired Figures under figs/
@@ -96,3 +96,5 @@ The manuscript text is not open source. The authors reserve the rights to the ar
 - MAC counts: https://github.com/sovrasov/flops-counter.pytorch
 
 - Dice Loss: https://github.com/hubutui/DiceLoss-PyTorch
+
+We additionally thank ICANN 2021 reviewers for insightful comments.

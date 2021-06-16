@@ -10,7 +10,7 @@ sys.path.append("../../")
 sys.path.append("../../../")
 
 from combinet.src.losses import SegmentationLoss
-from combinet.src.architecture.models import CombiNet51, CombiNet62, CombiNet87
+from combinet.src.architecture.models import CombiNetS, CombiNetM, CombiNetL
 from combinet.src.trainer import Trainer
 from combinet.src.dataset.loaders import *
 from combinet.experiments.utils import segmentation_evaluation
@@ -19,7 +19,7 @@ from combinet.src.profile import count_parameters_macs
 
 parser = argparse.ArgumentParser("camvid")
 
-parser.add_argument('--model', type=str, default='combinet51',
+parser.add_argument('--model', type=str, default='combinetS',
                     help='the model that we want to train')
 parser.add_argument('--learning_rate', type=float,
                     default=0.001, help='init learning rate')
@@ -66,12 +66,12 @@ def main():
 
   model_temp = None
   model = None
-  if args.model == "combinet51":
-    model_temp = CombiNet51
-  if args.model == "combinet62":
-    model_temp = CombiNet62
-  if args.model == "combinet87":
-    model_temp = CombiNet87
+  if args.model == "combinetS":
+    model_temp = CombiNetS
+  if args.model == "combinetM":
+    model_temp = CombiNetM
+  if args.model == "combinetL":
+    model_temp = CombiNetL
 
   if args.load=='EXP':
     criterion = SegmentationLoss(args)

@@ -66,13 +66,13 @@ def main():
 
   model_temp = None
   model = None
-  if args.model == "combinetS":
-    model_temp = CombiNetS
-  if args.model == "combinetM":
-    model_temp = CombiNetM
   if args.model == "combinetL":
     model_temp = CombiNetL
 
+  elif args.model == "combinetM":
+    model_temp = CombiNetM
+  elif args.model == "combinetS":
+    model_temp = CombiNetS
   if args.load=='EXP':
     criterion = SegmentationLoss(args)
 
@@ -91,7 +91,7 @@ def main():
           model.parameters(),
           args.learning_rate,
           weight_decay=args.weight_decay)
-    
+
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.996)
 
     logging.info('## Beginning Training ##')

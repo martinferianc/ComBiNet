@@ -16,7 +16,6 @@ class StreamSegMetrics():
         
         self.entropy = AverageMeter()
         self.nll = AverageMeter()
-        self.ece = AverageMeter()
 
         if self.args.dataset == "camvid":
             self.class_weight = CLASS_WEIGHT_CAMVID
@@ -24,20 +23,20 @@ class StreamSegMetrics():
             self.class_weight = CLASS_WEIGHT_BACTERIA
         elif self.args.dataset == "random":
             self.class_weight = torch.ones((args.n_classes,))
-
+        
+        self.outputs = []
+        self.targets = []
+        
     @staticmethod
-    def get_predictions(output):
-        bs, c, h, w = output.size()
-        tensor = output.data
-        _, indices = tensor.max(1)
-        indices = indices.view(bs, h, w)
-        return indices
-
-    @staticmethod
-    def ec_error(output, target):
-        _ece = 0.0
-        confidences, predictions = torch.max(output, 1)
-        accuracies = predictions.eq(target)
+    def get_predictions(output_mean):
+        return torch.argmax(output_mean, dim=1)
+        
+    def ece(self):
+        ece = 0.0
+        outputs = torch.cat(self.outputs, dim=0)
+        targets = torch.cat(self.targets, dim=0)
+        confidences, predictions = torch.max(outputs, 1)
+        accuracies = predictions.eq(targets)
 
         bin_boundaries = torch.linspace(0, 1, 10 + 1)
         bin_lowers = bin_boundaries[:-1]
@@ -50,11 +49,10 @@ class StreamSegMetrics():
             if prop_in_bin.item() > 0:
                 accuracy_in_bin = accuracies[in_bin].float().mean()
                 avg_confidence_in_bin = confidences[in_bin].mean()
-                _ece += torch.abs(avg_confidence_in_bin -
+                ece += torch.abs(avg_confidence_in_bin -
                                     accuracy_in_bin) * prop_in_bin
-        _ece = _ece if isinstance(_ece, float) else _ece.item()
-        return _ece
-
+        ece = ece if isinstance(ece, float) else ece.item()
+        return ece*100
 
     def update(self, labels, output_mean):
         with torch.no_grad():
@@ -66,11 +64,12 @@ class StreamSegMetrics():
                 self.confusion_matrix += self._fast_hist(lt.view(-1), lp.view(-1))
             nll = F.nll_loss(torch.log(output_mean+1e-8), labels, weight=self.class_weight.to(predictions.device)
                             if predictions.is_cuda else self.class_weight, reduction='mean').item()
-            ece =  self.ec_error(output_mean.view(-1, self.n_classes), labels.view(-1))*100
             entropy = -(torch.sum(torch.log(output_mean+1e-8)*output_mean)/(bs * h * w)).item()
+            
+            self.outputs.append(output_mean.permute(0, 2, 3, 1).reshape(-1, self.n_classes).detach())
+            self.targets.append(labels.reshape(-1).detach())
 
             self.nll.update(nll, bs * h * w)
-            self.ece.update(ece, bs * h * w)
             self.entropy.update(entropy, bs * h * w)
     
     def _fast_hist(self, label_true, label_pred):
@@ -94,14 +93,16 @@ class StreamSegMetrics():
             mean_iu = nanmean(iu)
             dice = 2 * torch.diag(hist) / (hist.sum(dim=1) + hist.sum(dim=0))
             mean_dice = nanmean(dice)
-        return (1.-acc.item())*100, (1.-acc_cls.item())*100, mean_iu.item()*100, mean_dice.item(), self.ece.avg, self.entropy.avg, self.nll.avg
+            ece = self.ece()
+        return (1.-acc.item())*100, (1.-acc_cls.item())*100, mean_iu.item()*100, mean_dice.item(), ece, self.entropy.avg, self.nll.avg
 
         
     def reset(self):
         self.confusion_matrix = torch.zeros((self.n_classes, self.n_classes))
         self.entropy.reset()
         self.nll.reset()
-        self.ece.reset()
+        self.outputs = []
+        self.targets = []
 
 
 class AverageMeter(object):
